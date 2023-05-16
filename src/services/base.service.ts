@@ -19,7 +19,7 @@ export class BaseService<T extends Document> implements IBaseService {
     async getAll(req: Request, res: Response): Promise<Response> {
 
         try {
-            const data = await this.model.find();
+            const data = await this.model.find({ deleted: false });
             return res.status(200).json(data);
         }
         catch (error) {
@@ -33,16 +33,16 @@ export class BaseService<T extends Document> implements IBaseService {
     async saveOne(req: Request, res: Response) {
         try {
 
-        const data = req.body;
+            const data = req.body;
 
-        if (data._id && data._id != "") {
-            await this.model.findOneAndUpdate({ _id: data._id }, { $set: data }, { $new: true });
-        }
-        else {
-            await this.model.create(data);
-        }
+            if (data._id && data._id != "") {
+                await this.model.findOneAndUpdate({ _id: data._id }, { $set: data }, { $new: true });
+            }
+            else {
+                await this.model.create(data);
+            }
 
-        return res.status(201).json({ message: "Saved successfully", "Data": data });
+            return res.status(201).json({ message: "Saved successfully", "Data": data });
         }
         catch (error) {
 
@@ -57,7 +57,7 @@ export class BaseService<T extends Document> implements IBaseService {
 
             const { id } = req.params;
 
-            const data = await this.model.findById(id, { password: 0 }).exec();
+            const data = await this.model.findById(id, { password: 0 }, { deleted: false }).exec();
 
             return res.status(200).json(data);
         }
